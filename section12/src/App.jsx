@@ -3,10 +3,12 @@ import Quiz from "./components/Quiz";
 
 function App() {
   return (
-    <div>
+    <>
       <Header />
-      <Quiz />
-    </div>
+      <main>
+        <Quiz />
+      </main>
+    </>
   );
 }
 
