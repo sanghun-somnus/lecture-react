@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import QuestionTimer from "./QuestionTimer";
+
 import QUESTIONS from "../data";
 import completeLogo from "../assets/quiz-complete.png";
 
@@ -30,6 +32,10 @@ export default function Quiz() {
   return (
     <div id='quiz'>
       <div id='question'>
+        <QuestionTimer
+          timeout={1000 * 15}
+          onTimeout={() => handleSelectAnswer(null)}
+        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id='answers'>
           {suffledAnswers.map((answer) => (
