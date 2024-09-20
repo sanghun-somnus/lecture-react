@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import QuestionTimer from "./QuestionTimer";
 
@@ -23,9 +23,11 @@ export default function Quiz() {
     );
   }
 
-  const handleSelectAnswer = (selectedAnswer) => {
+  // event handlers
+  const handleSelectAnswer = useCallback((selectedAnswer) => {
     setUserAnswers((prev) => [...prev, selectedAnswer]);
-  };
+  }, []);
+  const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer]);
 
   const suffledAnswers = QUESTIONS[activeQuestionIndex].answers.sort(() => Math.random() - 0.5);
 
@@ -33,8 +35,8 @@ export default function Quiz() {
     <div id='quiz'>
       <div id='question'>
         <QuestionTimer
-          timeout={1000 * 15}
-          onTimeout={() => handleSelectAnswer(null)}
+          timeout={1000 * 5}
+          onTimeout={handleSkipAnswer}
         />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id='answers'>
