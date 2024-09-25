@@ -11,6 +11,17 @@ export default function Question({ index, onSelectAnswer, onSkipAnswer }) {
     isCorrect: null,
   });
 
+  let timer = 1000 * 10;
+  // 답을 선택했을 때
+  if (answer.selectedAnswer) {
+    // 1초 후에 정답 | 오답을 나타낸다
+    timer = 1000;
+  }
+  if (answer.isCorrect !== null) {
+    // 2초 후에 다음 문제로 넘어간다
+    timer = 2000;
+  }
+
   const handleSelectAnswer = (answer) => {
     setAnswer({
       selectedAnswer: answer,
@@ -39,8 +50,10 @@ export default function Question({ index, onSelectAnswer, onSkipAnswer }) {
   return (
     <div id='question'>
       <QuestionTimer
-        timeout={1000 * 5}
-        onTimeout={onSkipAnswer}
+        key={timer}
+        timeout={timer}
+        onTimeout={answer.selectedAnswer === "" ? onSkipAnswer : null}
+        mode={answerState}
       />
       <h2>{QUESTIONS[index].text}</h2>
       <Answers
