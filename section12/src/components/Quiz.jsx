@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 
 // components
-import QuestionTimer from "./QuestionTimer";
+import Question from "./Question";
 
 // assets
 import QUESTIONS from "../data";
@@ -34,6 +34,8 @@ export default function Quiz() {
     },
     [activeQuestionIndex]
   );
+
+  console.log(userAnswers);
   const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer]);
 
   if (quizIsComplete) {
@@ -48,45 +50,17 @@ export default function Quiz() {
     );
   }
 
-  const suffledAnswers = QUESTIONS[activeQuestionIndex].answers.sort(() => Math.random() - 0.5);
-
   return (
     <div id='quiz'>
-      <div id='question'>
-        <QuestionTimer
-          key={activeQuestionIndex}
-          timeout={1000 * 5}
-          onTimeout={handleSkipAnswer}
-        />
-        <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
-        <ul id='answers'>
-          {suffledAnswers.map((answer) => {
-            const isSelected = userAnswers[userAnswers.length - 1] === answer;
-            let classes = "";
-
-            if (answerState === "answered" && isSelected) {
-              classes += "selected";
-            }
-            if ((answerState === "correct" || answerState === "wrong") && isSelected) {
-              classes += answerState;
-            }
-
-            return (
-              <li
-                key={answer}
-                className='answer'
-              >
-                <button
-                  onClick={() => handleSelectAnswer(answer)}
-                  className={classes}
-                >
-                  {answer}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      <Question
+        key={activeQuestionIndex}
+        questionText={QUESTIONS[activeQuestionIndex].text}
+        answers={QUESTIONS[activeQuestionIndex].answers}
+        selectedAnswer={userAnswers[userAnswers.length - 1]}
+        answerState={answerState}
+        onSelectAnswer={handleSelectAnswer}
+        onSkipAnswer={handleSkipAnswer}
+      />
     </div>
   );
 }
