@@ -5,6 +5,7 @@ import MinusIcon from "../UI/Icons/MinusIcon.jsx";
 import PlusIcon from "../UI/Icons/PlusIcon.jsx";
 import CounterOutput from "./CounterOutput.jsx";
 import { log } from "../../log.js";
+import CounterHistory from "./CounterHistory.jsx";
 
 function isPrime(number) {
   log("Calculating if is prime number", 2, "other");
@@ -27,14 +28,19 @@ const Counter = memo(function Counter({ initialCount }) {
   log("<Counter /> rendered", 1);
   const initialCountIsPrime = useMemo(() => isPrime(initialCount), [initialCount]);
 
-  const [counter, setCounter] = useState(initialCount);
+  const [counterChanges, setCounterChanges] = useState([{ value: initialCount, id: crypto.randomUUID() }]);
+  // const [counter, setCounter] = useState(initialCount);
+
+  const currentCounter = counterChanges.reduce((prevCounter, currentChange) => prevCounter + currentChange.value, 0);
 
   const handleDecrement = useCallback(function handleDecrement() {
-    setCounter((prevCounter) => prevCounter - 1);
+    setCounterChanges((prev) => [{ value: -1, id: crypto.randomUUID() }, ...prev]);
+    // setCounter((prevCounter) => prevCounter - 1);
   }, []);
 
   const handleIncrement = useCallback(function handleIncrement() {
-    setCounter((prevCounter) => prevCounter + 1);
+    setCounterChanges((prev) => [{ value: 1, id: crypto.randomUUID() }, ...prev]);
+    // setCounter((prevCounter) => prevCounter + 1);
   }, []);
 
   return (
@@ -49,7 +55,7 @@ const Counter = memo(function Counter({ initialCount }) {
         >
           Decrement
         </IconButton>
-        <CounterOutput value={counter} />
+        <CounterOutput value={currentCounter} />
         <IconButton
           icon={PlusIcon}
           onClick={handleIncrement}
@@ -57,6 +63,7 @@ const Counter = memo(function Counter({ initialCount }) {
           Increment
         </IconButton>
       </p>
+      <CounterHistory history={counterChanges} />
     </section>
   );
 });
