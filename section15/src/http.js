@@ -1,6 +1,8 @@
+const BASE_URL = "http://localhost:3000";
+
 export async function fetchAvailablePlaces() {
   // code here
-  const response = await fetch("http://localhost:3000/places");
+  const response = await fetch(`${BASE_URL}/places`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -11,7 +13,7 @@ export async function fetchAvailablePlaces() {
 }
 
 export async function updateUserPlaces(places) {
-  const response = await fetch("http://localhost:3000/user-places", {
+  const response = await fetch(`${BASE_URL}/user-places`, {
     // 메서드 변경 (default: GET)
     method: "PUT",
     // 전송할 수 있는 형태로 데이터 변환
@@ -29,4 +31,15 @@ export async function updateUserPlaces(places) {
   }
 
   return data.message;
+}
+
+export async function fetchUserPlaces() {
+  const response = await fetch(`${BASE_URL}/user-places`);
+  const resData = await response.json();
+
+  if (!response.ok) {
+    throw new Error("Faild to fetch user places");
+  }
+
+  return resData.places;
 }

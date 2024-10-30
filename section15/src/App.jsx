@@ -1,20 +1,38 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 import Places from "./components/Places.jsx";
 import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
 import logoImg from "./assets/logo.png";
 import AvailablePlaces from "./components/AvailablePlaces.jsx";
-import { updateUserPlaces } from "./http.js";
+import { fetchUserPlaces, updateUserPlaces } from "./http.js";
 import Error from "./components/Error.jsx";
 
 function App() {
   const selectedPlace = useRef();
 
   const [userPlaces, setUserPlaces] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [error, setError] = useState(null);
+
   const [errorUpdatingPlaces, setErrorUpdatingPlaces] = useState();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setIsFetching(true);
+      try {
+        const fetchedPlaces = await fetchUserPlaces();
+        setUserPlaces(fetchedPlaces);
+      } catch (error) {
+        setUserPlaces([]);
+        setError({ message: error.message || "Failed to fetch user places" });
+      }
+
+      setIsFetching(false);
+    })();
+  }, []);
 
   function handleStartRemovePlace(place) {
     setModalIsOpen(true);
@@ -46,11 +64,20 @@ function App() {
     }
   }
 
-  const handleRemovePlace = useCallback(async function handleRemovePlace() {
-    setUserPlaces((prevPickedPlaces) => prevPickedPlaces.filter((place) => place.id !== selectedPlace.current.id));
+  const handleRemovePlace = useCallback(
+    async function handleRemovePlace() {
+      setUserPlaces((prevPickedPlaces) => prevPickedPlaces.filter((place) => place.id !== selectedPlace.current.id));
 
-    setModalIsOpen(false);
-  }, []);
+      try {
+        await updateUserPlaces(userPlaces.filter((place) => place.id !== selectedPlace.current.id));
+      } catch (error) {
+        setUserPlaces(userPlaces);
+        setErrorUpdatingPlaces({ message: error.message || "Failed to delete place" });
+      }
+      setModalIsOpen(false);
+    },
+    [userPlaces]
+  );
 
   const handleError = () => {
     setErrorUpdatingPlaces(null);
@@ -89,12 +116,22 @@ function App() {
         <p>Create your personal collection of places you would like to visit or you have visited.</p>
       </header>
       <main>
-        <Places
-          title="I'd like to visit ..."
-          fallbackText='Select the places you would like to visit below.'
-          places={userPlaces}
-          onSelectPlace={handleStartRemovePlace}
-        />
+        {error && (
+          <Error
+            title='An error occurred!'
+            message={error.message}
+          />
+        )}
+        {!error && (
+          <Places
+            title="I'd like to visit ..."
+            fallbackText='Select the places you would like to visit below.'
+            isLoading={isFetching}
+            loadingText='Fetching your places...'
+            places={userPlaces}
+            onSelectPlace={handleStartRemovePlace}
+          />
+        )}
 
         <AvailablePlaces onSelectPlace={handleSelectPlace} />
       </main>
