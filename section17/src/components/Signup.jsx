@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 export default function Signup() {
+  const [isEqualPassword, setIsEqualPassword] = useState(true);
+
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -8,6 +12,9 @@ export default function Signup() {
 
     data.acquisition = acquisitionData;
 
+    if (data.password !== data["confirme-password"]) {
+      setIsEqualPassword(false);
+    }
     // Todo: remove test code
     console.log(data);
   }
@@ -23,6 +30,7 @@ export default function Signup() {
           id="email"
           type="email"
           name="email"
+          required
         />
       </div>
 
@@ -33,6 +41,8 @@ export default function Signup() {
             id="password"
             type="password"
             name="password"
+            required
+            minLength={8}
           />
         </div>
 
@@ -42,7 +52,12 @@ export default function Signup() {
             id="confirm-password"
             type="password"
             name="confirm-password"
+            required
+            minLength={8}
           />
+          <div className="control-error">
+            {!isEqualPassword && <p>must be equal</p>}
+          </div>
         </div>
       </div>
 
@@ -55,6 +70,7 @@ export default function Signup() {
             type="text"
             id="first-name"
             name="first-name"
+            required
           />
         </div>
 
@@ -64,6 +80,7 @@ export default function Signup() {
             type="text"
             id="last-name"
             name="last-name"
+            required
           />
         </div>
       </div>
@@ -72,7 +89,8 @@ export default function Signup() {
         <label htmlFor="phone">What best describes your role?</label>
         <select
           id="role"
-          name="role">
+          name="role"
+          required>
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
           <option value="employee">Employee</option>
@@ -120,6 +138,7 @@ export default function Signup() {
             type="checkbox"
             id="terms-and-conditions"
             name="terms"
+            required
           />
           I agree to the terms and conditions
         </label>
