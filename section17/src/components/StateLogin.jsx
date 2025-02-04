@@ -1,23 +1,52 @@
 import { useState } from "react";
+import { produce } from "immer";
 
 export default function Login() {
   const [entered, setEntered] = useState({
-    email: "",
-    password: "",
+    email: {
+      value: "",
+      didEdit: false,
+    },
+    password: {
+      value: "",
+      didEdit: false,
+    },
   });
 
+  // validation
+  const isInValidEmail =
+    entered.email.didEdit && !entered.email.value.includes("@");
+  const isInValidPassword =
+    entered.password.didEdit && entered.password.value.length < 8;
+
   function handleEnteredChange(e) {
-    const identifer = e.target.name;
-    // Todo: remove test code
-    console.log(`[${identifer}] ${e.target.value}`);
-    setEntered((prev) => ({
-      ...prev,
-      [identifer]: e.target.value,
-    }));
+    setEntered(
+      produce((draft) => {
+        const target = draft[e.target.name];
+
+        target.value = e.target.value;
+        target.didEdit = false;
+      })
+    );
+  }
+
+  function handleEnteredBlur(e) {
+    if (!(e.target.tagName === "INPUT")) return;
+
+    setEntered(
+      produce((draft) => {
+        const target = draft[e.target.name];
+
+        console.log(target);
+        target.didEdit = true;
+      })
+    );
   }
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
+    <form
+      onSubmit={(e) => e.preventDefault()}
+      onBlur={handleEnteredBlur}>
       <h2>Login</h2>
 
       <div className="control-row">
@@ -28,9 +57,12 @@ export default function Login() {
             type="email"
             name="email"
             placeholder="enter your email"
-            value={entered.email}
+            value={entered.email.value}
             onChange={handleEnteredChange}
           />
+          <div className="control-error">
+            {isInValidEmail && <p>must include @</p>}
+          </div>
         </div>
 
         <div className="control no-margin">
@@ -40,9 +72,12 @@ export default function Login() {
             type="password"
             name="password"
             placeholder="enter your password"
-            value={entered.password}
+            value={entered.password.value}
             onChange={handleEnteredChange}
           />
+          <div className="control-error">
+            {isInValidPassword && <p>at least 8</p>}
+          </div>
         </div>
       </div>
 
