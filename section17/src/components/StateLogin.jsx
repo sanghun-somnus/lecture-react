@@ -1,52 +1,32 @@
-import { useState } from "react";
-import { produce } from "immer";
 import Input from "./Input";
+import { useInput } from "../hooks/useInput";
+import { hasMinLength, isEmail, isNotEmpty } from "../util/validation";
 
 export default function Login() {
-  const [entered, setEntered] = useState({
-    email: {
-      value: "",
-      didEdit: false,
-    },
-    password: {
-      value: "",
-      didEdit: false,
-    },
-  });
+  const {
+    entered: email,
+    hasError: emailHasError,
+    handleChange: handleEmailChange,
+    handleBlur: handleEmailBlur,
+  } = useInput("", (value) => isEmail(value) && isNotEmpty(value));
+  const {
+    entered: password,
+    hasError: passwordHasError,
+    handleChange: handlePasswordChange,
+    handleBlur: handlePasswordBlur,
+  } = useInput("", (value) => hasMinLength(value, 8));
 
-  // validation
-  const isInValidEmail =
-    entered.email.didEdit && !entered.email.value.includes("@");
-  const isInValidPassword =
-    entered.password.didEdit && entered.password.value.trim().length < 8;
+  function handleSubmit(e) {
+    e.preventDefault();
 
-  function handleEnteredChange(name, value) {
-    setEntered(
-      produce((draft) => {
-        const target = draft[name];
-
-        target.value = value;
-        target.didEdit = false;
-      })
-    );
+    if (emailHasError || passwordHasError) {
+      console.log("not pass validation");
+      return;
+    }
+    console.log("pass validation");
   }
-
-  function handleEnteredBlur(e) {
-    if (!(e.target.tagName === "INPUT")) return;
-
-    setEntered(
-      produce((draft) => {
-        const target = draft[e.target.name];
-
-        target.didEdit = true;
-      })
-    );
-  }
-
   return (
-    <form
-      onSubmit={(e) => e.preventDefault()}
-      onBlur={handleEnteredBlur}>
+    <form onSubmit={handleSubmit}>
       <h2>Login</h2>
 
       <div className="control-row">
@@ -56,9 +36,10 @@ export default function Login() {
           type="email"
           name="email"
           placeholder="enter your email"
-          value={entered.email.value}
-          onChange={(e) => handleEnteredChange(e.target.name, e.target.value)}
-          error={isInValidEmail && "must include @"}
+          value={email.value}
+          onChange={handleEmailChange}
+          onBlur={handleEmailBlur}
+          error={emailHasError && "must include @"}
         />
         <Input
           label="Password"
@@ -66,10 +47,11 @@ export default function Login() {
           type="password"
           name="password"
           placeholder="enter your password"
-          value={entered.password.value}
-          onChange={(e) => handleEnteredChange(e.target.name, e.target.value)}
+          value={password.value}
+          onChange={handlePasswordChange}
+          onBlur={handlePasswordBlur}
           minLength={8}
-          error={isInValidPassword && "at least 8"}
+          error={passwordHasError && "at least 8"}
         />
       </div>
 
