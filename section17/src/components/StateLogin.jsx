@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { produce } from "immer";
+import Input from "./Input";
 
 export default function Login() {
   const [entered, setEntered] = useState({
@@ -17,14 +18,14 @@ export default function Login() {
   const isInValidEmail =
     entered.email.didEdit && !entered.email.value.includes("@");
   const isInValidPassword =
-    entered.password.didEdit && entered.password.value.length < 8;
+    entered.password.didEdit && entered.password.value.trim().length < 8;
 
-  function handleEnteredChange(e) {
+  function handleEnteredChange(name, value) {
     setEntered(
       produce((draft) => {
-        const target = draft[e.target.name];
+        const target = draft[name];
 
-        target.value = e.target.value;
+        target.value = value;
         target.didEdit = false;
       })
     );
@@ -37,7 +38,6 @@ export default function Login() {
       produce((draft) => {
         const target = draft[e.target.name];
 
-        console.log(target);
         target.didEdit = true;
       })
     );
@@ -50,35 +50,27 @@ export default function Login() {
       <h2>Login</h2>
 
       <div className="control-row">
-        <div className="control no-margin">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="enter your email"
-            value={entered.email.value}
-            onChange={handleEnteredChange}
-          />
-          <div className="control-error">
-            {isInValidEmail && <p>must include @</p>}
-          </div>
-        </div>
-
-        <div className="control no-margin">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="enter your password"
-            value={entered.password.value}
-            onChange={handleEnteredChange}
-          />
-          <div className="control-error">
-            {isInValidPassword && <p>at least 8</p>}
-          </div>
-        </div>
+        <Input
+          label="Email"
+          id="email"
+          type="email"
+          name="email"
+          placeholder="enter your email"
+          value={entered.email.value}
+          onChange={(e) => handleEnteredChange(e.target.name, e.target.value)}
+          error={isInValidEmail && "must include @"}
+        />
+        <Input
+          label="Password"
+          id="password"
+          type="password"
+          name="password"
+          placeholder="enter your password"
+          value={entered.password.value}
+          onChange={(e) => handleEnteredChange(e.target.name, e.target.value)}
+          minLength={8}
+          error={isInValidPassword && "at least 8"}
+        />
       </div>
 
       <p className="form-actions">
