@@ -7,7 +7,7 @@ import {
 } from "../util/validation";
 
 export default function Signup() {
-  const [state, action, isPending] = useActionState(signupAction, {
+  const [formState, formAction, isPending] = useActionState(signupAction, {
     errors: null,
   });
   function signupAction(prev, fd) {
@@ -15,8 +15,10 @@ export default function Signup() {
     const data = Object.fromEntries(fd.entries());
     data.acquisition = fd.getAll("acquisition");
 
+    console.log(data);
+
     let errors = [];
-    if (!isEmail(data.email) || isNotEmpty(data.email))
+    if (!isEmail(data.email) || !isNotEmpty(data.email))
       errors.push("email: include @ or fill");
     if (!isNotEmpty(data.password) || !hasMinLength(data.password, 8))
       errors.push("password: at least 8");
@@ -30,12 +32,18 @@ export default function Signup() {
     if (!data.terms) errors.push("terms: must check");
 
     if (errors.length > 0) {
-      return { errors };
+      return {
+        errors,
+        entered: {
+          ...data,
+          acquisition: [...data.acquisition],
+        },
+      };
     }
     return { errors: null };
   }
   return (
-    <form action={action}>
+    <form action={formAction}>
       <h2>Welcome on board!</h2>
       <p>We just need a little bit of data from you to get you started 🚀</p>
 
@@ -45,6 +53,7 @@ export default function Signup() {
           id="email"
           type="email"
           name="email"
+          defaultValue={formState.entered?.email}
         />
       </div>
 
@@ -55,6 +64,7 @@ export default function Signup() {
             id="password"
             type="password"
             name="password"
+            defaultValue={formState.entered?.password}
           />
         </div>
 
@@ -64,6 +74,7 @@ export default function Signup() {
             id="confirm-password"
             type="password"
             name="confirm-password"
+            defaultValue={formState.entered?.["confirm-password"]}
           />
         </div>
       </div>
@@ -77,6 +88,7 @@ export default function Signup() {
             type="text"
             id="first-name"
             name="first-name"
+            defaultValue={formState.entered?.["first-name"]}
           />
         </div>
 
@@ -86,6 +98,7 @@ export default function Signup() {
             type="text"
             id="last-name"
             name="last-name"
+            defaultValue={formState.entered?.["last-name"]}
           />
         </div>
       </div>
@@ -94,7 +107,8 @@ export default function Signup() {
         <label htmlFor="phone">What best describes your role?</label>
         <select
           id="role"
-          name="role">
+          name="role"
+          defaultChecked={formState.entered?.role}>
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
           <option value="employee">Employee</option>
@@ -111,6 +125,7 @@ export default function Signup() {
             id="google"
             name="acquisition"
             value="google"
+            defaultChecked={formState.entered?.acquisition.includes("google")}
           />
           <label htmlFor="google">Google</label>
         </div>
@@ -121,6 +136,7 @@ export default function Signup() {
             id="friend"
             name="acquisition"
             value="friend"
+            defaultChecked={formState.entered?.acquisition.includes("friend")}
           />
           <label htmlFor="friend">Referred by friend</label>
         </div>
@@ -131,6 +147,7 @@ export default function Signup() {
             id="other"
             name="acquisition"
             value="other"
+            defaultChecked={formState.entered?.acquisition.includes("other")}
           />
           <label htmlFor="other">Other</label>
         </div>
@@ -142,15 +159,16 @@ export default function Signup() {
             type="checkbox"
             id="terms-and-conditions"
             name="terms"
+            defaultChecked={!!formState.entered?.terms}
           />
           I agree to the terms and conditions
         </label>
       </div>
 
       {/* error */}
-      {!!state.errors && (
+      {!!formState.errors && (
         <ul className="error">
-          {state.errors.map((error) => (
+          {formState.errors.map((error) => (
             <li key={error}>{error}</li>
           ))}
         </ul>
