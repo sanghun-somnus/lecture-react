@@ -1,18 +1,61 @@
+import { useActionState } from "react";
+import {
+  isEmail,
+  isNotEmpty,
+  isEqualToOtherValue,
+  hasMinLength,
+} from "../util/validation";
+
 export default function Signup() {
+  const [state, action, isPending] = useActionState(signupAction, {
+    errors: null,
+  });
+  function signupAction(prev, fd) {
+    /* email, password, confirm-password, first-name, last-name, role, acquisition, term */
+    const data = Object.fromEntries(fd.entries());
+    data.acquisition = fd.getAll("acquisition");
+
+    let errors = [];
+    if (!isEmail(data.email) || isNotEmpty(data.email))
+      errors.push("email: include @ or fill");
+    if (!isNotEmpty(data.password) || !hasMinLength(data.password, 8))
+      errors.push("password: at least 8");
+    if (!isEqualToOtherValue(data.password, data["confirm-password"]))
+      errors.push("confirm-password: equal to password");
+    if (!isNotEmpty(data["first-name"]) || !isNotEmpty(data["last-name"]))
+      errors.push("name: fill");
+    if (!isNotEmpty(data.role)) errors.push("role: must");
+    if (data.acquisition.length === 0)
+      errors.push("acquisition: check at least 1");
+    if (!data.terms) errors.push("terms: must check");
+
+    if (errors.length > 0) {
+      return { errors };
+    }
+    return { errors: null };
+  }
   return (
-    <form>
+    <form action={action}>
       <h2>Welcome on board!</h2>
       <p>We just need a little bit of data from you to get you started 🚀</p>
 
       <div className="control">
         <label htmlFor="email">Email</label>
-        <input id="email" type="email" name="email" />
+        <input
+          id="email"
+          type="email"
+          name="email"
+        />
       </div>
 
       <div className="control-row">
         <div className="control">
           <label htmlFor="password">Password</label>
-          <input id="password" type="password" name="password" />
+          <input
+            id="password"
+            type="password"
+            name="password"
+          />
         </div>
 
         <div className="control">
@@ -30,18 +73,28 @@ export default function Signup() {
       <div className="control-row">
         <div className="control">
           <label htmlFor="first-name">First Name</label>
-          <input type="text" id="first-name" name="first-name" />
+          <input
+            type="text"
+            id="first-name"
+            name="first-name"
+          />
         </div>
 
         <div className="control">
           <label htmlFor="last-name">Last Name</label>
-          <input type="text" id="last-name" name="last-name" />
+          <input
+            type="text"
+            id="last-name"
+            name="last-name"
+          />
         </div>
       </div>
 
       <div className="control">
         <label htmlFor="phone">What best describes your role?</label>
-        <select id="role" name="role">
+        <select
+          id="role"
+          name="role">
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
           <option value="employee">Employee</option>
@@ -73,20 +126,40 @@ export default function Signup() {
         </div>
 
         <div className="control">
-          <input type="checkbox" id="other" name="acquisition" value="other" />
+          <input
+            type="checkbox"
+            id="other"
+            name="acquisition"
+            value="other"
+          />
           <label htmlFor="other">Other</label>
         </div>
       </fieldset>
 
       <div className="control">
         <label htmlFor="terms-and-conditions">
-          <input type="checkbox" id="terms-and-conditions" name="terms" />I
-          agree to the terms and conditions
+          <input
+            type="checkbox"
+            id="terms-and-conditions"
+            name="terms"
+          />
+          I agree to the terms and conditions
         </label>
       </div>
 
+      {/* error */}
+      {!!state.errors && (
+        <ul className="error">
+          {state.errors.map((error) => (
+            <li key={error}>{error}</li>
+          ))}
+        </ul>
+      )}
+
       <p className="form-actions">
-        <button type="reset" className="button button-flat">
+        <button
+          type="reset"
+          className="button button-flat">
           Reset
         </button>
         <button className="button">Sign up</button>
