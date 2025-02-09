@@ -2,7 +2,7 @@
   "opinions": [
     {
       "id": 1739110784354,
-      "votes": -1,
+      "votes": 3,
       "userName": "Kim",
       "title": "Bitcoin",
       "body": "Bitcoin is best asset"
@@ -12,7 +12,7 @@
       "userName": "Maximilian Schwarzmüller",
       "title": "Do yourself a favor and learn React!",
       "body": "React is an amazing JavaScript library!\n\nDespite all it's shortcomings.",
-      "votes": 0
+      "votes": 4
     },
     {
       "id": 2,
