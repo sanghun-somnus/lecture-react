@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from "react";
 
 export const OpinionsContext = createContext({
   opinions: null,
@@ -12,7 +12,7 @@ export function OpinionsContextProvider({ children }) {
 
   useEffect(() => {
     async function loadOpinions() {
-      const response = await fetch('http://localhost:3000/opinions');
+      const response = await fetch("http://localhost:3000/opinions");
       const opinions = await response.json();
       setOpinions(opinions);
     }
@@ -21,10 +21,10 @@ export function OpinionsContextProvider({ children }) {
   }, []);
 
   async function addOpinion(enteredOpinionData) {
-    const response = await fetch('http://localhost:3000/opinions', {
-      method: 'POST',
+    const response = await fetch("http://localhost:3000/opinions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(enteredOpinionData),
     });
@@ -37,7 +37,22 @@ export function OpinionsContextProvider({ children }) {
     setOpinions((prevOpinions) => [savedOpinion, ...prevOpinions]);
   }
 
-  function upvoteOpinion(id) {
+  async function upvoteOpinion(id) {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/opinions/${id}/upvote`,
+        { method: "POST" }
+      );
+
+      // 서버측 에러 발생
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      return;
+    }
+
+    // 문제 없음
     setOpinions((prevOpinions) => {
       return prevOpinions.map((opinion) => {
         if (opinion.id === id) {
@@ -48,7 +63,22 @@ export function OpinionsContextProvider({ children }) {
     });
   }
 
-  function downvoteOpinion(id) {
+  async function downvoteOpinion(id) {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/opinions/${id}/downvote`,
+        { method: "POST" }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error!! status: ${response.status}`);
+      }
+    } catch (error) {
+      // 문제발생
+      return;
+    }
+
+    // 문제없음
     setOpinions((prevOpinions) => {
       return prevOpinions.map((opinion) => {
         if (opinion.id === id) {

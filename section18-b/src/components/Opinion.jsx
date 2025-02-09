@@ -1,4 +1,20 @@
+import { use } from "react";
+import { OpinionsContext } from "../store/opinions-context";
+import { useActionState } from "react";
+
 export function Opinion({ opinion: { id, title, body, userName, votes } }) {
+  const { upvoteOpinion, downvoteOpinion } = use(OpinionsContext);
+  const [upvoteState, upvoteAction, upvotePending] =
+    useActionState(upvoteActionFn);
+  const [downvoteState, downvoteAction, downvotePending] =
+    useActionState(downvoteActionFn);
+
+  async function upvoteActionFn() {
+    await upvoteOpinion(id);
+  }
+  async function downvoteActionFn() {
+    await downvoteOpinion(id);
+  }
   return (
     <article>
       <header>
@@ -7,7 +23,9 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
       </header>
       <p>{body}</p>
       <form className="votes">
-        <button>
+        <button
+          formAction={upvoteAction}
+          disabled={upvotePending}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -17,9 +35,14 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect width="18" height="18" x="3" y="3" rx="2" />
+            strokeLinejoin="round">
+            <rect
+              width="18"
+              height="18"
+              x="3"
+              y="3"
+              rx="2"
+            />
             <path d="m16 12-4-4-4 4" />
             <path d="M12 16V8" />
           </svg>
@@ -27,7 +50,9 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
 
         <span>{votes}</span>
 
-        <button>
+        <button
+          formAction={downvoteAction}
+          disabled={downvotePending}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -37,9 +62,14 @@ export function Opinion({ opinion: { id, title, body, userName, votes } }) {
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect width="18" height="18" x="3" y="3" rx="2" />
+            strokeLinejoin="round">
+            <rect
+              width="18"
+              height="18"
+              x="3"
+              y="3"
+              rx="2"
+            />
             <path d="M12 8v8" />
             <path d="m8 12 4 4 4-4" />
           </svg>
