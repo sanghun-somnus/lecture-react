@@ -1,39 +1,43 @@
 import { useActionState } from "react";
 import { isEmpty } from "../utils/validate";
-
-function actionFn(prevState, fd) {
-  // userName, title, body
-  const data = Object.fromEntries(fd.entries());
-
-  let errors = [];
-
-  // validation : isEmpty
-  for (let [key, value] of Object.entries(data)) {
-    if (isEmpty(value)) {
-      errors.push(`${key} must be required`);
-    }
-  }
-
-  // 에러 존재
-  if (errors.length > 0) {
-    return {
-      errors,
-      values: {
-        ...data,
-      },
-    };
-  }
-
-  return {
-    errors: null,
-  };
-}
+import { OpinionsContext } from "../store/opinions-context";
+import { use } from "react";
 
 export function NewOpinion() {
+  const { addOpinion } = use(OpinionsContext);
   const [formState, formAction, isPending] = useActionState(actionFn, {
     errors: null,
   });
 
+  async function actionFn(prevState, fd) {
+    // userName, title, body
+    const data = Object.fromEntries(fd.entries());
+
+    let errors = [];
+
+    // validation : isEmpty
+    for (let [key, value] of Object.entries(data)) {
+      if (isEmpty(value)) {
+        errors.push(`${key} must be required`);
+      }
+    }
+
+    // 에러 존재
+    if (errors.length > 0) {
+      return {
+        errors,
+        values: {
+          ...data,
+        },
+      };
+    }
+
+    // 백엔드로 데이터 제출 ( 최소 1초 이상 걸림 by code )
+    await addOpinion({ ...data });
+    return {
+      errors: null,
+    };
+  }
   return (
     <div id="new-opinion">
       <h2>Share your opinion!</h2>

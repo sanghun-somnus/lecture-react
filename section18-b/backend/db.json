@@ -1,6 +1,13 @@
 {
   "opinions": [
     {
+      "id": 1739110784354,
+      "votes": 0,
+      "userName": "Kim",
+      "title": "Bitcoin",
+      "body": "Bitcoin is best asset"
+    },
+    {
       "id": 1,
       "userName": "Maximilian Schwarzmüller",
       "title": "Do yourself a favor and learn React!",
