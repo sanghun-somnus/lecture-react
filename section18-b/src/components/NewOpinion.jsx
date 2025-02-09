@@ -2,6 +2,7 @@ import { useActionState } from "react";
 import { isEmpty } from "../utils/validate";
 import { OpinionsContext } from "../store/opinions-context";
 import { use } from "react";
+import SubmitButton from "./SubmitButton";
 
 export function NewOpinion() {
   const { addOpinion } = use(OpinionsContext);
@@ -78,13 +79,7 @@ export function NewOpinion() {
             ))}
           </ul>
         )}
-        <p className="actions">
-          <button
-            type="submit"
-            disabled={isPending}>
-            Submit
-          </button>
-        </p>
+        <SubmitButton />
       </form>
     </div>
   );
